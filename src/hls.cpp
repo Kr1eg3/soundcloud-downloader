@@ -68,6 +68,12 @@ HlsPlaylist HlsDownloader::parse_m3u8(const std::string& m3u8_content,
                 current_key_uri.clear();
                 current_iv.clear();
             }
+        } else if (line.find("#EXT-X-MAP") == 0) {
+            std::regex map_uri_re(R"re(URI="([^"]+)")re");
+            std::smatch match;
+            if (std::regex_search(line, match, map_uri_re)) {
+                playlist.init_segment_uri = resolve_url(match[1].str());
+            }
         } else if (line.find("#EXTINF:") == 0) {
             auto comma = line.find(',');
             auto dur_str = line.substr(8, comma - 8);
@@ -133,6 +139,12 @@ bool HlsDownloader::download_stream(const std::string& m3u8_url,
     std::ofstream out(output_path, std::ios::binary);
     if (!out) {
         throw std::runtime_error("Cannot open output file: " + output_path.string());
+    }
+
+    if (playlist.init_segment_uri) {
+        auto init_data = http_.get_binary(*playlist.init_segment_uri);
+        out.write(reinterpret_cast<const char*>(init_data.data()),
+                  static_cast<std::streamsize>(init_data.size()));
     }
 
     size_t total = playlist.segments.size();

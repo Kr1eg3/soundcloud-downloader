@@ -48,6 +48,7 @@ struct HlsPlaylist {
     std::vector<HlsSegment> segments;
     std::optional<std::string> global_key_uri;
     std::optional<std::string> global_iv_hex;
+    std::optional<std::string> init_segment_uri;
 };
 
 } // namespace sc
