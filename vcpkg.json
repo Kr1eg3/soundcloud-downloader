@@ -1,0 +1,11 @@
+{
+  "name": "sc-downloader",
+  "version": "0.1.0",
+  "dependencies": [
+    "curl",
+    "openssl",
+    "nlohmann-json",
+    "cli11",
+    "taglib"
+  ]
+}
