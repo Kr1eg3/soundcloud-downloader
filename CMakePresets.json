@@ -2,21 +2,28 @@
   "version": 6,
   "configurePresets": [
     {
+      "name": "default",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
       "name": "msvc-debug",
+      "inherits": "default",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
       "name": "msvc-release",
+      "inherits": "default",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ],

@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: "01f602195983451bc83e72f4214af2cbc495aa94"
+
+      - name: Configure
+        run: >
+          cmake -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Package
+        run: |
+          mkdir release
+          copy build\sc-dl.exe release\
+          Compress-Archive -Path release\* -DestinationPath sc-dl-${{ github.ref_name }}-win-x64.zip
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sc-dl-${{ github.ref_name }}-win-x64.zip
+          generate_release_notes: true

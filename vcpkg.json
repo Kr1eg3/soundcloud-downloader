@@ -5,7 +5,6 @@
     "curl",
     "openssl",
     "nlohmann-json",
-    "cli11",
     "taglib"
   ]
 }

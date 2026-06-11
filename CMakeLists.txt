@@ -8,8 +8,17 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
-find_package(CLI11 CONFIG REQUIRED)
 find_package(TagLib CONFIG REQUIRED)
+
+include(FetchContent)
+FetchContent_Declare(
+    cli11
+    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+    GIT_TAG        v2.4.2
+    GIT_SHALLOW    TRUE
+)
+set(CLI11_PRECOMPILED OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(cli11)
 
 add_executable(sc-dl
     src/main.cpp

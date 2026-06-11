@@ -12,19 +12,24 @@ SoundCloudApi::SoundCloudApi(HttpClient& http, const std::string& client_id)
 
 namespace {
 
+std::string json_str(const json& j, const std::string& key) {
+    if (j.contains(key) && j[key].is_string()) {
+        return j[key].get<std::string>();
+    }
+    return {};
+}
+
 TrackInfo parse_track(const json& j) {
     TrackInfo t;
     t.id = j.value("id", int64_t(0));
-    t.title = j.value("title", std::string());
+    t.title = json_str(j, "title");
 
     if (j.contains("user") && j["user"].is_object()) {
-        t.artist = j["user"].value("username", std::string());
+        t.artist = json_str(j["user"], "username");
     }
 
-    t.permalink_url = j.value("permalink_url", std::string());
-    t.artwork_url = j.value("artwork_url", std::string());
-    if (t.artwork_url == "null") t.artwork_url.clear();
-
+    t.permalink_url = json_str(j, "permalink_url");
+    t.artwork_url = json_str(j, "artwork_url");
     t.duration_ms = j.value("duration", 0);
     t.is_streamable = j.value("streamable", false);
 
@@ -45,7 +50,7 @@ std::variant<TrackInfo, PlaylistInfo> SoundCloudApi::resolve(const std::string& 
     }
 
     auto j = json::parse(response.body);
-    auto kind = j.value("kind", std::string());
+    auto kind = json_str(j, "kind");
 
     if (kind == "track") {
         return parse_track(j);
@@ -54,13 +59,13 @@ std::variant<TrackInfo, PlaylistInfo> SoundCloudApi::resolve(const std::string& 
     if (kind == "playlist") {
         PlaylistInfo pl;
         pl.id = j.value("id", int64_t(0));
-        pl.title = j.value("title", std::string());
+        pl.title = json_str(j, "title");
 
         if (j.contains("user") && j["user"].is_object()) {
-            pl.artist = j["user"].value("username", std::string());
+            pl.artist = json_str(j["user"], "username");
         }
 
-        pl.permalink_url = j.value("permalink_url", std::string());
+        pl.permalink_url = json_str(j, "permalink_url");
 
         std::vector<int64_t> incomplete_ids;
 
